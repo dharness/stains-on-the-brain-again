@@ -1,0 +1,32 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html ng-app="myapp">
+  <head>
+    
+    <!-- load angular and angular route via CDN -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-route.js"></script>
+    <script src="http://cdn.jsdelivr.net/jquery.mixitup/latest/jquery.mixitup.min.js?v=2.1.2"></script>
+    
+    <!-- Basic Angular App -->
+    <script src="app.js"></script>
+   
+    
+    <!-- Controllers -->
+    <script src="controllers/about.js"></script>
+    <script src="controllers/gameplay.js"></script>
+    <script src="controllers/login.js"></script>
+    <script src="controllers/mystains.js"></script>
+    <script src="controllers/profile.js"></script>
+    <script src="controllers/signup.js"></script>
+
+    
+  </head>
+  <body ng-controller="mainController">
+    <!-- this is where content will be injected -->
+    <div ng-view></div>
+  </body>
+
+
+</html>

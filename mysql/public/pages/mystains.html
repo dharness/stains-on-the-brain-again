@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<head>
+<link rel="stylesheet" type="text/css" href="../styles/mixitup.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://cdn.jsdelivr.net/jquery.mixitup/latest/jquery.mixitup.min.js?v=2.1.2"></script>
+
+<!-- A Hack but a small one -->
+<script type="text/javascript">
+	$(function() {
+    $('#Container').mixItUp();
+});
+</script>
+
+</head>
+
+  <body>
+
+    <div class="controls">
+        <label>FILTER:</label>
+        
+        <button class="filter" data-filter="all">All</button>
+        <button class="filter" data-filter=".category-1">Beastly</button>
+        <button class="filter" data-filter=".category-2">Melancholy</button>
+        <button class="filter" data-filter=".category-3">Fruity</button>
+        <button class="filter" data-filter=".category-4">Disgruntled</button>
+        
+        <label>Sort:</label>
+        
+        <button class="sort" data-sort="myorder:asc">First to Last</button>
+        <button class="sort" data-sort="myorder:desc">Last to First</button>
+
+    </div>
+
+    <div id="Container" class="container">
+      <div class="mix category-1" data-myorder="1"></div>
+      <div class="mix category-2" data-myorder="2"></div>
+      <div class="mix category-3" data-myorder="3"></div>
+      <div class="mix category-4" data-myorder="4"></div>
+      <div class="mix category-1" data-myorder="5"></div>
+      <div class="mix category-2" data-myorder="6"></div>
+      <div class="mix category-3" data-myorder="7"></div>
+      <div class="mix category-4" data-myorder="8"></div>
+      <div class="mix category-1" data-myorder="9"></div>
+      <div class="mix category-2" data-myorder="10"></div>
+      <div class="mix category-3" data-myorder="11"></div>
+      <div class="mix category-4" data-myorder="12"></div>
+      <div class="mix category-1" data-myorder="13"></div>
+      <div class="mix category-2" data-myorder="14"></div>
+      <div class="mix category-3" data-myorder="15"></div>
+      <div class="mix category-4" data-myorder="16"></div>
+      
+
+      
+      <div class="gap"></div>
+      <div class="gap"></div>
+    </div>
+
+  </body>

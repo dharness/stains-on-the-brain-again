@@ -1,0 +1,52 @@
+
+body {
+	font-family: Calibri, Arial, sans-serif;
+	color: #ffe8e7;
+	background:  #eedfcc url(../images/bg2.jpg) no-repeat center top;
+	webkit-background-size: cover;
+    background-size: cover;
+	font-weight: 300;
+	overflow-x: hidden;
+}
+/* general style for the form */
+.nl-form {
+	width: 100%;
+	margin: 0.3em auto 0 auto;
+	font-size: 2em;
+	line-height: 1.5;
+}
+
+
+
+/* normalize the input elements, make them look like everything else */
+.nl-form input,
+.nl-form select,
+.nl-form button {
+	border: none;
+	background: transparent;
+	font-family: inherit;
+	font-size: inherit;
+	color: inherit;
+	font-weight: inherit;
+	line-height: inherit;
+	display: inline-block;
+	padding: 0;
+	margin: 0;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+}
+
+
+
+/* the toggle is the visible part in the form */
+.nl-field-toggle,
+.nl-form input,
+.nl-form select  {
+	line-height: inherit;
+	display: inline-block;
+	color: #fff;
+	cursor: pointer;
+	border-bottom: 1px dashed #fff;
+}
+
+
