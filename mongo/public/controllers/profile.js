@@ -6,18 +6,12 @@ var currentMatchIndex = 0; //default is the first match in the array
 
 
 
-myapp.controller('profileController', function($scope, $http) {
+myapp.controller('profileController', function($scope, $location) {
 
-
-    /* USE THIS BEFORE ENTERING ANY USER-SPECIFIC PAGE */
-    $http.get("/authorize").success(function(res) {
-
-        if (res) { //if res is false, nobody is logged in
-            currentUser = res; //otherwise, res stores the current user
-        }
-
-    });
-
+    if (!currentUser) {
+        $location.path('/login');
+        return;
+    }
 
     //left button
     $scope.previousMatch = function() { //make the decrements circular
@@ -25,7 +19,7 @@ myapp.controller('profileController', function($scope, $http) {
         if (currentMatchIndex > 0) { //make the increments circular
             currentMatchIndex--;
         } else {
-            currentMatchIndex = 9; //put the index at the end
+            currentMatchIndex = allMatchs.length - 1; //put the index at the end
         }
 
         updateMatchDisplay($scope);
@@ -44,46 +38,28 @@ myapp.controller('profileController', function($scope, $http) {
     }
 
     //get the account info for the currently logged in user
-    $http.get("/user/" + currentUser.username).success(function(data) {
-        user_id = data[0].user_id;
-        $scope.firstname = data[0].firstname;
-        $scope.lastname = data[0].lastname;
-        $scope.username = data[0].username;
-        $scope.email = data[0].email;
-        $scope.gender = data[0].gender;
-        $scope.preference = data[0].preference;
-        $scope.country = data[0].country;
+    var data = db.getUser(currentUser.username);
+    user_id = data[0].user_id;
+    $scope.firstname = data[0].firstname;
+    $scope.lastname = data[0].lastname;
+    $scope.username = data[0].username;
+    $scope.email = data[0].email;
+    $scope.gender = data[0].gender;
+    $scope.preference = data[0].preference;
+    $scope.country = data[0].country;
 
-        //get the currently logged in user's matches
-        $http.get("/matches/" + currentUser.username).success(function(matches) {
-
-            //loop thru first 10 matches
-            matches.forEach(function(match) {
-                if (user_id == match.user1_id) { //if the first user in the match is current user
-                    //get the data about each match
-                    $http.get("/user_id/" + match.user2_id).success(function(user) {
-                        allMatchs.push(user[0]);
-                        if (allMatchs.length >= 10) {
-                            updateMatchDisplay($scope);
-                        }
-                    });
-
-                } else if (user_id == match.user2_id) { //if the second user in the match is current user
-
-                    $http.get("/user_id/" + match.user1_id).success(function(user) {
-                        allMatchs.push(user[0]);
-                        if (allMatchs.length >= 10) {
-                            updateMatchDisplay($scope);
-                        }
-                    });
-
-                }
-            });
-
-
-        });
-
+    //get the currently logged in user's matches
+    allMatchs = [];
+    db.getMatches(currentUser.username).forEach(function(match) {
+        //the other user in the match (whichever id isn't this user's)
+        var otherId = (user_id == match.user1_id) ? match.user2_id : match.user1_id;
+        var user = db.getUserById(otherId);
+        if (user[0]) allMatchs.push(user[0]);
     });
+
+    if (allMatchs.length) {
+        updateMatchDisplay($scope);
+    }
 
 });
 

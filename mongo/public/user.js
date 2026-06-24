@@ -1,4 +1,4 @@
-function User(userData, $http) {
+function User(userData) {
     this.username = userData.username
     this.password = userData.password
     this.firstname = userData.firstname
@@ -8,7 +8,6 @@ function User(userData, $http) {
     this.country = userData.country
     this.gender = userData.gender
     this.preference = userData.preference
-    this.$http = $http
 }
 
 User.prototype.updateMatches = function(cp_chosen) {
@@ -19,24 +18,19 @@ User.prototype.updateMatches = function(cp_chosen) {
     }
 }
 
-User.prototype.levelUp = function(cp_chosen) {
-    console.log(cp_chosen)
-
+User.prototype.levelUp = function(cp_chosen, onDone) {
     var updates = {
-        username: currentUser.username,
-        sts_id: currentUser.level_num + 1,
+        username: this.username,
+        sts_id: this.level_num + 1,
         cp_chosen: cp_chosen
     }
 
-    this.$http.post('/stain/create', updates)
-    this.$http.post("/levelup/" + currentUser.username).success(function(data) {
-        this.level_num++
-    })
+    db.createStain(updates)
+    db.levelUp(this.username)
 
+    if (onDone) onDone()
 }
 
 User.prototype.getMystains = function(onFind) {
-    this.$http.get("/mystains/" + this.username).success(function(data) {
-        onFind(data)
-    });
+    onFind(db.getMystains(this.username))
 }

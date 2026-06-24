@@ -1,1 +1,61 @@
-<!-- ================================ PROFILE  ================================ -->
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+	<head>
+		<title>Profile</title>
+		<link rel="shortcut icon" href="favicon.ico">
+		<link rel="stylesheet" type="text/css" href="styles/default.css" />
+		<link rel="stylesheet" type="text/css" href="styles/component.css" />
+		<script src="controllers/modernizr.custom.js"></script>
+	</head>
+	<body>
+		<div class="container demo-3">
+			
+			<ul class="grid cs-style-4">
+				<h1>{{firstname}} {{lastname}}</h1>
+				
+				<!-- USER -->
+				<li>
+					<figure id="user">
+						<div><img src="images/1.png" alt="img01"></div>
+						<figcaption>
+						<h3>NAME: <h4> {{firstname}}</h4><br></h3>
+						<h3>EMAIL: <h4> {{email}}</h4></h3>
+						<h3>GENDER: <h4>{{gender}}</h4></h3>
+						<h3>PREFERENCE: <h4>{{preference}}</h4></h3>
+						<h3>COUNTRY: <h4>{{country}}</h4></h3>
+						</figcaption>
+					</figure>
+				</li>
+				
+				
+				<!-- MATCH -->
+				<li>
+					<figure>
+							<div><img src="images/1.png" alt="img01"></div>
+							<figcaption>
+							<h3>NAME: <h4> {{matchFirstname}}</h4><br></h3>
+							<h3>EMAIL: <h4> {{matchEmail}}</h4></h3>
+							<h3>GENDER: <h4>{{matchGender}}</h4></h3>
+							<h3>PREFERENCE: <h4>{{matchPreference}}</h4></h3>
+							<h3>COUNTRY: <h4>{{matchCountry}}</h4></h3>
+							</figcaption>
+					</figure>
+				</li>
+
+				<button ng-click="previousMatch()">Left</button>
+				<button ng-click="nextMatch()">Right</button>
+				
+				
+				
+				<li>
+					Matches:
+					<p></p>
+					
+					<ul id="matches">
+					</ul>
+					
+				</li>
+			</ul>
+		</div>
+	</body>
+</html>

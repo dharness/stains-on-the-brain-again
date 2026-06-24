@@ -22,3 +22,10 @@
 .buffer {
 	margin-top:180px;
 }
+
+#animateTest img {
+	max-width: 80vw;
+	max-height: 80vh;
+	width: auto;
+	height: auto;
+}

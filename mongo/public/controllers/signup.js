@@ -1,4 +1,4 @@
-myapp.controller('signupController', function($scope, $http, $location) {
+myapp.controller('signupController', function($scope, $location) {
 
     $scope.submit = function() {
 
@@ -14,11 +14,7 @@ myapp.controller('signupController', function($scope, $http, $location) {
             preference: $('#preference').val()
         }
 
-        $http.post('/user/create', user).success(function(data, status, headers, config) {
-            $location.path("/login")
-        }).
-        error(function(data, status, headers, config) {
-            console.log('ERROR: ')
-        })
+        db.createUser(user);
+        $location.path("/login")
     }
 })

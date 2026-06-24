@@ -8,15 +8,10 @@ var port = process.env.PORT || 8080
 var bodyParser = require('body-parser')
 var methodOverride = require('method-override')
 var http = require('http')
-var MongoClient = require('mongodb').MongoClient;
 
 // DATBASE CRUMS ======================================
-
-MongoClient.connect('mongodb://stain_db_user:bluecakes@ds031611.mongolab.com:31611/stain_db', function(err, db) {
-    if (err) throw err;
-    console.log("Connected to Database");
-    _db = db //this is our global database object
-})
+// (the original remote MongoDB instance is long gone - app/routes.js
+// now uses an in-memory store from app/data.js instead)
 
 app.use(bodyParser.json()) // get information from html forms
 app.use(bodyParser.urlencoded({

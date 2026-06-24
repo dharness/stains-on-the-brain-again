@@ -1,4 +1,7 @@
 //================================Routes===========================================//
+var db = require('./data.js')
+
+var currentUser = null
 
 module.exports = function(app) {
 
@@ -10,53 +13,64 @@ module.exports = function(app) {
 
     //Query by username
     app.get('/user/:username', function(req, res) {
-        connection.query('SELECT * FROM user WHERE (username = "' + req.params.username + '")',
-            function(err, rows) {
-                if (err)
-                    res.send(err);
-                res.json(rows);
-            });
+        var rows = db.users.filter(function(u) {
+            return u.username === req.params.username
+        })
+        res.json(rows);
     });
 
 
 
     //Query by user_id
     app.get('/user_id/:user_id', function(req, res) {
-        connection.query('SELECT * FROM user WHERE (user_id = "' + req.params.user_id + '")',
-            function(err, rows) {
-                if (err)
-                    res.send(err);
-                res.json(rows);
-
-            });
+        var rows = db.users.filter(function(u) {
+            return String(u.user_id) === req.params.user_id
+        })
+        res.json(rows);
     });
 
     app.get('/matches/:username', function(req, res) {
+        var user = db.users.filter(function(u) {
+            return u.username === req.params.username
+        })[0]
 
-        connection.query('SELECT degree_of_match, user1_id, user2_id FROM matches WHERE (user1_id = (SELECT user_id FROM user WHERE username = "' + req.params.username + '") OR user2_id = (SELECT user_id FROM user WHERE username = "' + req.params.username + '")) ORDER BY degree_of_match LIMIT 0,10',
-            function(err, rows) {
+        var rows = []
+        if (user) {
+            rows = db.matches.filter(function(m) {
+                return m.user1_id === user.user_id || m.user2_id === user.user_id
+            }).sort(function(a, b) {
+                return a.degree_of_match - b.degree_of_match
+            }).slice(0, 10)
+        }
 
-                if (err)
-                    res.send(err);
-
-                res.json(rows);
-
-            });
+        res.json(rows);
     });
 
     //=============================== LOGIN ===========================================
+    // demo mode: any username/password logs in - matches an existing user by
+    // username if there is one, otherwise creates one on the fly
     app.get('/login/:username/:password', function(req, res) {
 
-        _db.collection('stain_db_users').findOne({
+        var result = db.users.filter(function(u) {
+            return u.username === req.params.username
+        })[0]
+
+        if (!result) {
+            result = db.createUser({
                 username: req.params.username,
-                password: req.params.password
-            },
-            function(err, result) {
-                if (err)
-                    throw err
-                if (result)
-                    res.send(result)
+                password: req.params.password,
+                firstname: req.params.username,
+                lastname: '',
+                email: '',
+                level_num: 0,
+                country: '',
+                gender: '',
+                preference: ''
             })
+        }
+
+        currentUser = result
+        res.send(result)
     });
 
 
@@ -64,9 +78,7 @@ module.exports = function(app) {
 
     app.post("/user/create", function(req, res) {
 
-        _db.collection('stain_db_users').insert({
-
-            //all info for a particular user
+        db.createUser({
             username: req.body.username,
             password: req.body.password,
             firstname: req.body.firstname,
@@ -76,98 +88,84 @@ module.exports = function(app) {
             country: req.body.country,
             gender: req.body.gender,
             preference: req.body.preference
-
-        }, function(err, records) {
-            if (err)
-                throw err
-            res.send('200 OK')
         })
 
+        res.send('200 OK')
     });
 
-    //========================== GET 4 CLEANING PRODUCTS FOR USER'S NEXT LEVEL =============================
+    //========================== GET CURRENT STAIN AND ITS 4 CLEANING PRODUCTS FOR THE USER =============================
     app.get('/cp_to_show/:username', function(req, res) {
 
-        connection.query('SELECT sts.cp1_id, sts.cp2_id, sts.cp3_id, sts.cp4_id FROM stain_to_show sts WHERE level_number = (SELECT (1 + u.level_num ) FROM user u WHERE (u.username = "' + req.params.username + '"))',
-            function(err, rows) {
-                if (err)
-                    res.send(err);
-                res.json(rows);
-            });
+        var user = db.users.filter(function(u) {
+            return u.username === req.params.username
+        })[0]
 
+        var rows = []
+        if (user) {
+            var level = ((user.level_num - 1) % db.stainToShow.length) + 1
+            rows = db.stainToShow.filter(function(s) {
+                return s.level_number === level
+            })
+        }
+
+        res.json(rows);
     });
     //========================== GET CLEANING PRODUCT NAME WITH ID ===================================
     app.get('/cp_name/:cp_id', function(req, res) {
 
-        var queryText = 'SELECT product_name FROM cleaning_product WHERE product_id = ' + req.params.cp_id;
-        console.log('query: ' + queryText);
-        connection.query(queryText, function(err, rows) {
+        var rows = db.cleaningProducts.filter(function(p) {
+            return p.product_id === Number(req.params.cp_id)
+        })
 
-            res.send(rows);
-
-        });
+        res.send(rows);
     });
-
-
-
-    //====================== GET IMAGE URL FOR CURRENT USER ==================================================
-
-    // app.get('/img_url/:username', function(req, res) {
-
-    //     connection.query('SELECT img_url from substance WHERE substance_id = ( SELECT substance_id from stain_to_show WHERE level_number = ( SELECT 1+ level_num from user WHERE (username = "' + req.params.username + '") ) )',
-    //         function(err, rows) {
-    //             if (err)
-    //                 res.send(err);
-    //             res.json(rows);
-    //         });
-    // });
 
     //======================Make a MyStain==================================================
 
     //get stain to show id of the stain the user cleaned
     app.get('/sts_id/:username', function(req, res) {
 
-        connection.query("SELECT sts_id FROM stain_to_show WHERE level_number = (SELECT 1 + level_num from user WHERE (username = '" + req.params.username + "'))",
+        var user = db.users.filter(function(u) {
+            return u.username === req.params.username
+        })[0]
 
-            function(err, rows) {
-                if (err)
-                    res.send(err);
-                res.json(rows);
-            });
+        var rows = []
+        if (user) {
+            rows = db.stainToShow.filter(function(s) {
+                return s.level_number === (1 + user.level_num)
+            }).map(function(s) {
+                return { sts_id: s.sts_id }
+            })
+        }
 
+        res.json(rows);
     });
 
 
     app.post("/stain/create", function(req, res) {
 
-        _db.collection('stain_db_mystains').insert({
-
+        db.mystains.push({
             username: req.body.username,
             sts_id: req.body.sts_id,
             cp_chosen: req.body.cp_chosen
-
-        }, function(err, records) {
-            if (err)
-                throw err
-            res.send('200 OK')
         })
+
+        res.send('200 OK')
     })
 
     //====================== LEVEL UP A USER ==================================================
 
     app.post("/levelup/:username", function(req, res) {
 
-        _db.collection('stain_db_users').update({
-            username: req.params.username
-        }, {
-            $inc: {
-                level_num: 1
-            }
-        }, function(err, records) {
-            if (err)
-                throw err
-            res.send('200 OK')
-        })
+        var user = db.users.filter(function(u) {
+            return u.username === req.params.username
+        })[0]
+
+        if (user) {
+            user.level_num += 1
+        }
+
+        res.send('200 OK')
     })
 
 
@@ -175,19 +173,17 @@ module.exports = function(app) {
     //=========================== GET MYSTAIN BY USERNAME ============================================
     app.get('/mystains/:username', function(req, res) {
 
-        _db.collection('stain_db_mystains').find({
-            username: req.params.username
-        }, {
+        var docs = db.mystains.filter(function(m) {
+            return m.username === req.params.username
+        }).map(function(m) {
+            return {
+                username: m.username,
+                sts_id: m.sts_id,
+                cp_chosen: m.cp_chosen
+            }
+        })
 
-            username: 1,
-            sts_id: 1,
-            cp_chosen: 1,
-            _id: 0
-
-        }).toArray(function(err, docs) { //return the mystains as an array
-            res.send(docs);
-        });
-
+        res.send(docs);
     });
 
 }

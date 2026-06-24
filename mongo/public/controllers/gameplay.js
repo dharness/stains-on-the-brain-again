@@ -1,26 +1,30 @@
-myapp.controller('gameplayController', function($scope, $http) {
+ // create the controller and inject Angular's $scope
+ myapp.controller('gameplayController', function($scope, $location) {
 
-    //====================== USER CHOOSES A CLEANING PRODUCT=============================
+     if (!currentUser) {
+         $location.path('/login');
+         return;
+     }
 
-    gotoLevel(currentUser.level_num + 1, $scope)
+     //============================== LOAD THE CURRENT STAIN AND ITS 4 CLEANING PRODUCTS ================================
+     function loadLevel() {
+         var res = db.getCpToShow(currentUser.username);
 
-    //HACK - but a small one
-    $scope.cp1 = "Button 1"
-    $scope.cp2 = "Button 2"
-    $scope.cp3 = "Button 3"
-    $scope.cp4 = "Button 4"
+         if (!res || !res[0]) return;
 
-    $('.cleaningProduct').click(function() {
+         $scope.image_path = "images/" + res[0].img_url;
 
-        if (currentUser.level_num < 100) {
-            currentUser.levelUp($(this).text())
-            currentUser.updateMatches($(this).text())
-            gotoLevel(currentUser.level_num, $scope)
+         $scope.cp1 = db.getCpName(res[0].cp1_id)[0].product_name;
+         $scope.cp2 = db.getCpName(res[0].cp2_id)[0].product_name;
+         $scope.cp3 = db.getCpName(res[0].cp3_id)[0].product_name;
+         $scope.cp4 = db.getCpName(res[0].cp4_id)[0].product_name;
+     }
 
-        } else alert('Busted your cap sailor!');
-    })
-});
+     loadLevel();
 
-function gotoLevel(level_num, $scope) {
-    $scope.image_path = "../images/raw_stains/" + level_num + ".png"
-}
+     //====================== USER CHOOSES A CLEANING PRODUCT: ADVANCE TO THE NEXT STAIN =============================
+     $scope.choose = function(cp_chosen) {
+         currentUser.levelUp(cp_chosen, loadLevel);
+     }
+
+ });
