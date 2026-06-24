@@ -11,7 +11,7 @@ myapp.controller('mystainsController', function($scope) {
 
     currentUser.getMystains(function(data) {
         //do things with mystains
-        $('#Container').append("<img src='../images/raw_stains/" + 1 + ".png'/>"); // TODO - for testing, remove
+        $('#Container').append("<img src='images/raw_stains/" + 1 + ".png'/>"); // TODO - for testing, remove
     })
 
 });

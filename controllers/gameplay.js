@@ -12,7 +12,7 @@
 
          if (!res || !res[0]) return;
 
-         $scope.image_path = "../images/" + res[0].img_url;
+         $scope.image_path = "images/" + res[0].img_url;
 
          $scope.cp1 = db.getCpName(res[0].cp1_id)[0].product_name;
          $scope.cp2 = db.getCpName(res[0].cp2_id)[0].product_name;
